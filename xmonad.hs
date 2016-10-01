@@ -14,6 +14,7 @@ import XMonad.Layout.NoBorders
 import XMonad.Layout.Spiral
 import XMonad.Layout.Tabbed
 import XMonad.Layout.ThreeColumns
+import XMonad.Layout.ResizableTile
 import XMonad.Util.Run(spawnPipe)
 import XMonad.Util.EZConfig(additionalKeys)
 import Graphics.X11.ExtraTypes.XF86
@@ -26,10 +27,10 @@ import qualified Data.Map        as M
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
 --
-myTerminal = "/usr/bin/gnome-terminal"
+myTerminal = "/usr/bin/xterm"
 
 -- The command to lock the screen or show the screensaver.
-myScreensaver = "/usr/bin/gnome-screensaver-command --lock"
+myScreensaver = "/usr/bin/xscreensaver-command -lock"
 
 -- The command to take a selective screenshot, where you select
 -- what you'd like to capture on the screen.
@@ -47,7 +48,7 @@ myLauncher = "$(yeganesh -x -- -fn '-*-terminus-*-r-normal-*-*-120-*-*-*-*-iso88
 -- Workspaces
 -- The default number of workspaces (virtual screens) and their names.
 --
-myWorkspaces = ["1:term","2:web","3:code","4:vm","5:media"] ++ map show [6..9]
+myWorkspaces = ["1:main", "2:web","3:term","4:irc","5:code","6:media"] ++ map show [7..9]
 
 
 ------------------------------------------------------------------------
@@ -66,7 +67,7 @@ myWorkspaces = ["1:term","2:web","3:code","4:vm","5:media"] ++ map show [6..9]
 --
 myManageHook = composeAll
     [ className =? "Chromium"       --> doShift "2:web"
-    , className =? "Google-chrome"  --> doShift "2:web"
+    , className =? "firefox"  --> doShift "2:web"
     , resource  =? "desktop_window" --> doIgnore
     , className =? "Galculator"     --> doFloat
     , className =? "Steam"          --> doFloat
@@ -90,6 +91,7 @@ myManageHook = composeAll
 -- which denotes layout choice.
 --
 myLayout = avoidStruts (
+    ResizableTall 1 (3/100) (1/2) [] |||
     ThreeColMid 1 (3/100) (1/2) |||
     Tall 1 (3/100) (1/2) |||
     Mirror (Tall 1 (3/100) (1/2)) |||
@@ -153,6 +155,10 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
   -- Use this to launch programs without a key binding.
   , ((modMask, xK_p),
      spawn myLauncher)
+
+  -- Adjust Size for ResizableTile layout
+  , ((modMask, xK_a), sendMessage MirrorShrink)
+  , ((modMask, xK_z), sendMessage MirrorExpand)
 
   -- Take a selective screenshot using the command specified by mySelectScreenshot.
   , ((modMask .|. shiftMask, xK_p),
@@ -350,13 +356,8 @@ myStartupHook = return ()
 main = do
   xmproc <- spawnPipe "xmobar ~/.xmonad/xmobar.hs"
   xmonad $ defaults {
-      logHook = dynamicLogWithPP $ xmobarPP {
-            ppOutput = hPutStrLn xmproc
-          , ppTitle = xmobarColor xmobarTitleColor "" . shorten 100
-          , ppCurrent = xmobarColor xmobarCurrentWorkspaceColor ""
-          , ppSep = "   "
-      }
-      , manageHook = manageDocks <+> myManageHook
+      manageHook = manageDocks <+> myManageHook
+      , handleEventHook = handleEventHook defaultConfig <+> docksEventHook
       , startupHook = setWMName "LG3D"
   }
 
