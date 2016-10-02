@@ -51,6 +51,6 @@ Config { font = "-misc-fixed-*-*-*-*-22-*-*-*-*-*-*-*"
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = " %multicpu% | %memory% | %dynnetwork% }{ %StdinReader% }{ %battery% | %uptime% | <fc=#ee9a00>%date%</fc>"
+       , template = " %multicpu% | %memory% | %dynnetwork% }%StdinReader%{ %battery% | %uptime% | <fc=#ee9a00>%date%</fc>"
        }
 
