@@ -359,6 +359,12 @@ main = do
       manageHook = manageDocks <+> myManageHook
       , handleEventHook = handleEventHook defaultConfig <+> docksEventHook
       , startupHook = setWMName "LG3D"
+      , logHook = dynamicLogWithPP $ xmobarPP {
+              ppOutput = hPutStrLn xmproc
+            , ppTitle = xmobarColor xmobarTitleColor "" . shorten 10
+            , ppCurrent = xmobarColor xmobarCurrentWorkspaceColor ""
+            , ppSep = "   "
+      }
   }
 
 
